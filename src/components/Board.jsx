@@ -22,9 +22,17 @@ import {
     isDraggingAColumn,
 } from "@/utils/data";
 import { blockBoardPanningAttr } from "@/utils/data-atributes";
+import { Plus, XIcon } from "lucide-react";
+import { useForm } from "react-hook-form";
 
 export default function Board({ data, setData, fetchBoard }) {
     const scrollableRef = useRef(null);
+    const [showAddColumnForm, setShowAddColumnForm] = useState(false);
+    const {
+        handleSubmit,
+        register,
+        reset
+    } = useForm();
     // const [data, setData] = useState(initial);
 
     async function updateCardsList(columnId, cards) {
@@ -43,6 +51,49 @@ export default function Board({ data, setData, fetchBoard }) {
         );
         const newColumn = await res.json()
         // console.log(newColumn);
+    }
+
+    async function updateColumnsList(columns) {
+        console.log("changing the columns order for board id ", data.id)
+        console.log("new column order : " + columns)
+        const res = await fetch("http://localhost:8080/board/" + data.id,
+            {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    columns: columns,
+                }),
+            }
+        );
+        const newBoard = await res.json()
+        console.log(newBoard);
+    }
+
+
+    async function handleAddNewColumn(column) {
+        console.log("adding column ", column)
+        const res = await fetch("http://localhost:8080/column?boardId=" + data.id,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(
+                    {
+                        ...column,
+                        boardId: data.id
+                    }
+                )
+            }
+        )
+        const newColumn = await res.json();
+
+        fetchBoard();
+        reset()
+
+        console.log("new column ", newColumn);
     }
 
 
@@ -197,6 +248,7 @@ export default function Board({ data, setData, fetchBoard }) {
                             };
                             const columns = Array.from(data.columns);
                             columns[homeColumnIndex] = updated;
+
                             setData({ ...data, columns });
                             return;
                         }
@@ -267,6 +319,7 @@ export default function Board({ data, setData, fetchBoard }) {
                         startIndex: homeIndex,
                         finishIndex: destinationIndex,
                     });
+                    updateColumnsList(reordered)
                     setData({ ...data, columns: reordered });
                 },
             }),
@@ -384,12 +437,39 @@ export default function Board({ data, setData, fetchBoard }) {
     return (
         <div className={`flex h-full flex-col`}>
             <div
-                className={`flex h-full flex-row gap-3 overflow-x-auto p-3 [scrollbar-color:theme(colors.sky.600)_theme(colors.sky.800)] [scrollbar-width:thin]`}
+                className={`flex h-full flex-row gap-3 overflow-x-auto p-3 [scrollbar-color:theme(colors.slate.600)_theme(colors.slate.800)] [scrollbar-width:thin]`}
                 ref={scrollableRef}
             >
                 {data.columns.map((column) => (
                     <Column key={column.id} column={column} fetchBoard={fetchBoard} />
                 ))}
+
+                <div className="flex w-72 flex-shrink-0 select-none flex-col " >
+                    {
+                        showAddColumnForm
+                            ?
+                            <div className="flex mx-1 bg-white border-1 border-gray-200 text-neutral-50 rounded-lg ">
+                                <form onSubmit={handleSubmit(handleAddNewColumn)} className="flex w-full flex-col gap-2 p-2">
+                                    <input type="text" placeholder="Enter a title for your card" {...register("name")} className="bg-white text-black border-1 border-gray-200 px-2 py-2 rounded" />
+                                    <div className="flex items-center gap-3">
+                                        <button type="submit" className="bg-blue-400 p-2 rounded font-medium text-black text-sm cursor-pointer">Add List</button>
+                                        <button onClick={() => setShowAddColumnForm(false)} className="rounded p-2 hover:bg-slate-700 active:bg-slate-600 cursor-pointer">
+                                            <XIcon size={18} />
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            :
+                            <button
+                                className={`flex max-h-full flex-row gap-2 items-center p-2 rounded-lg bg-white text-slate-800 shadow-lg border-1 border-gray-200 hover:bg-slate-100 cursor-pointer`}
+                                onClick={() => setShowAddColumnForm(true)}
+
+                            >
+                                <Plus size={18} />
+                                Add another list
+                            </button>
+                    }
+                </div>
             </div>
         </div>
     );

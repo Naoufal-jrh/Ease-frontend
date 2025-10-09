@@ -249,7 +249,7 @@ export default function Column({ column, fetchBoard }) {
     return (
         <div className="flex w-72 flex-shrink-0 select-none flex-col" ref={outerFullHeightRef}>
             <div
-                className={`flex max-h-full flex-col rounded-lg bg-slate-800 text-neutral-50 ${stateStyles[state.type]}`}
+                className={`flex max-h-full flex-col rounded-lg bg-white text-slate-800 shadow-xl border-1 border-gray-200 ${stateStyles[state.type]}`}
                 ref={innerRef}
                 {...{ [blockBoardPanningAttr]: true }}
             >
@@ -258,7 +258,7 @@ export default function Column({ column, fetchBoard }) {
                     className={`flex max-h-full flex-col ${state.type === 'is-column-over' ? 'invisible' : ''}`}
                 >
                     <div className="flex flex-row items-center justify-between p-3 pb-2" ref={headerRef}>
-                        <div className="pl-2 font-bold leading-4">{column.title}</div>
+                        <div className="pl-2 font-bold leading-4">{column.name}</div>
                         <button
                             type="button"
                             className="rounded p-2 hover:bg-slate-700 active:bg-slate-600"
@@ -283,10 +283,10 @@ export default function Column({ column, fetchBoard }) {
                             ?
                             <div className="flex mx-1 ">
                                 <form onSubmit={handleSubmit(handleSubmitAddNewCard)} className="flex w-full flex-col gap-2 p-2">
-                                    <input type="text" placeholder="Enter a title for your card" {...register("description")} className="bg-slate-700 px-2 pt-2 pb-8 rounded" />
+                                    <input type="text" placeholder="Enter a title for your card" {...register("description")} className="bg-white border-1 border-gray-200 px-2 pt-2 pb-8 rounded" />
                                     <div className="flex items-center gap-3">
                                         <button type="submit" className="bg-blue-400 p-2 rounded font-medium text-black text-sm cursor-pointer">Add Card</button>
-                                        <button onClick={() => setShowAddCardForm(false)} className="rounded p-2 hover:bg-slate-700 active:bg-slate-600 cursor-pointer">
+                                        <button onClick={() => setShowAddCardForm(false)} className="rounded p-2 hover:bg-slate-200 active:bg-slate-100 cursor-pointer">
                                             <XIcon size={18} />
                                         </button>
                                     </div>
@@ -296,7 +296,7 @@ export default function Column({ column, fetchBoard }) {
                             <div className="flex flex-row gap-2 p-3">
                                 <button
                                     type="button"
-                                    className="flex flex-grow flex-row gap-1 rounded p-2 hover:bg-slate-700 active:bg-slate-600 cursor-pointer"
+                                    className="flex flex-grow flex-row gap-1 rounded p-2 hover:bg-slate-200 active:bg-slate-100 cursor-pointer"
                                     onClick={() => setShowAddCardForm(true)}
                                 >
                                     <Plus size={16} />
@@ -304,7 +304,7 @@ export default function Column({ column, fetchBoard }) {
                                 </button>
                                 <button
                                     type="button"
-                                    className="rounded p-2 hover:bg-slate-700 active:bg-slate-600 cursor-pointer"
+                                    className="rounded p-2 hover:bg-slate-200 active:bg-slate-100 cursor-pointer"
                                     aria-label="Create card from template"
                                 >
                                     <Copy size={16} />
