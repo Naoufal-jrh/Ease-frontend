@@ -23,6 +23,7 @@ import { preserveOffsetOnSource } from '@atlaskit/pragmatic-drag-and-drop/elemen
 import { isSafari } from "@/utils/is-safari";
 import { isShallowEqual } from "@/utils/is-shallow-equal";
 import { useForm } from "react-hook-form";
+import { addCard } from "@/lib/api";
 
 const stateStyles = {
     idle: 'cursor-grab',
@@ -51,19 +52,8 @@ export default function Column({ column, fetchBoard }) {
         handleSubmit,
     } = useForm()
 
-
     async function handleAddCard(card) {
-        await fetch("http://localhost:8080/card?columnId=" + column.id,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(
-                    card
-                )
-            }
-        )
+        await addCard(column.id, card);
         fetchBoard();
         reset();
     }
@@ -75,11 +65,7 @@ export default function Column({ column, fetchBoard }) {
             return;
         }
         handleAddCard(data);
-
     }
-
-
-
 
     useEffect(() => {
         const outer = outerFullHeightRef.current;

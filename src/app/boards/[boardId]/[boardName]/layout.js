@@ -1,8 +1,8 @@
 import "../../../globals.css";
 
 
-export default function BoardDetailsLayout({ children, params }) {
-    const { boardName } = params;
+export default async function BoardDetailsLayout({ children, params }) {
+    const { boardName } = await params;
     return (
 
         <div>

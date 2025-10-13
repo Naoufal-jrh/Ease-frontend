@@ -24,6 +24,7 @@ import {
 import { blockBoardPanningAttr } from "@/utils/data-atributes";
 import { Plus, XIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { addColumn, updateCards, updateColumns } from "@/lib/api";
 
 export default function Board({ data, setData, fetchBoard }) {
     const scrollableRef = useRef(null);
@@ -35,45 +36,15 @@ export default function Board({ data, setData, fetchBoard }) {
     } = useForm();
 
     async function updateCardsList(columnId, cards) {
-        await fetch("http://localhost:8080/card/toColumn/" + columnId,
-            {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(cards),
-            }
-        );
+        await updateCards(columnId, cards);
     }
 
     async function updateColumnsList(columns) {
-        await fetch("http://localhost:8080/column/toBoard/" + data.id,
-            {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(columns),
-            }
-        );
+        await updateColumns(data.id, columns)
     }
 
-
     async function handleAddNewColumn(column) {
-        await fetch("http://localhost:8080/column?boardId=" + data.id,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(
-                    {
-                        ...column,
-                        boardId: data.id
-                    }
-                )
-            }
-        )
+        await addColumn(data.id, column);
         fetchBoard();
         reset();
     }

@@ -1,6 +1,7 @@
 "use client"
 
 import PopUp from "@/components/Popup";
+import { addBoard, getBoards } from "@/lib/api";
 import { Grid, Rows } from "lucide-react";
 import { Borel } from "next/font/google";
 import Link from "next/link";
@@ -10,41 +11,31 @@ import { useForm } from "react-hook-form";
 export default function BoardsPage() {
     const [boards, setBoards] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
-    const { handleSubmit, register } = useForm();
+    const { handleSubmit, register, reset } = useForm();
 
-    async function addBoard(board) {
-        console.log("adding new board", board)
-        const res = await fetch("http://localhost:8080/board", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(board)
-        });
-        const data = await res.json();
-        console.log("board added", data)
+    async function handleAddBoard(board) {
+        await addBoard(board)
         fetchBoards();
         setIsOpen(false);
-
+        reset();
     }
 
     async function fetchBoards() {
-        const res = await fetch("http://localhost:8080/board")
-        const data = await res.json();
-        console.log("boards ", data);
+        const data = await getBoards();
         setBoards(data)
     }
 
     useEffect(() => {
         fetchBoards();
     }, []);
+
     return (
         <div className="p-5">
             <div className="flex flex-row justify-between items-center">
                 <h2 className="text-xl font-semibold text-slate-700 mt-6 mb-4">Boards</h2>
                 {/* <button className="bg-blue-400 text-slate-700 font-medium px-4 py-1 rounded-lg cursor-pointer hover:bg-blue-500">Create</button> */}
                 <PopUp isOpen={isOpen} setIsOpen={setIsOpen} buttonText="Create" title="Add new board" >
-                    <form onSubmit={handleSubmit(addBoard)} className="flex flex-col gap-2 mt-5">
+                    <form onSubmit={handleSubmit(handleAddBoard)} className="flex flex-col gap-2 mt-5">
                         <label className="text-sm">Board name</label>
                         <input type="text" className="p-2 border-2 rounded-lg border-gray-200" {...register("name")} />
                         <button type="submit" className="bg-blue-400 text-slate-700 font-medium px-4 py-1 rounded-lg cursor-pointer hover:bg-blue-500">Create</button>

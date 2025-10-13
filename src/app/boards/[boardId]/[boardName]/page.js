@@ -1,5 +1,6 @@
 "use client"
 import Board from "@/components/Board";
+import { getBoardById } from "@/lib/api";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -10,11 +11,8 @@ export default function BoardPage() {
     const [data, setData] = useState({});
 
     async function fetchBoard() {
-        console.log("fetching board ...")
-        const res = await fetch("http://localhost:8080/board/" + boardId);
-        const data = await res.json();
+        const data = await getBoardById(boardId)
         setData(data);
-        console.log("data ", data)
     }
 
     useEffect(() => {
