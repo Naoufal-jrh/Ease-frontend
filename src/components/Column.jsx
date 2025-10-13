@@ -52,8 +52,8 @@ export default function Column({ column, fetchBoard }) {
     } = useForm()
 
 
-    async function handleAdddCard(card) {
-        const res = await fetch("http://localhost:8080/card?columnId=" + column.id,
+    async function handleAddCard(card) {
+        await fetch("http://localhost:8080/card?columnId=" + column.id,
             {
                 method: "POST",
                 headers: {
@@ -64,23 +64,17 @@ export default function Column({ column, fetchBoard }) {
                 )
             }
         )
-        const data = await res.json();
-
         fetchBoard();
         reset();
-        console.log(data);
     }
 
     const handleSubmitAddNewCard = (data) => {
-        console.log(data)
-
         if (data.description === null || data.description.trim() === "") {
             console.log("empty description")
             setShowAddCardForm(false);
             return;
         }
-
-        handleAdddCard(data);
+        handleAddCard(data);
 
     }
 
@@ -189,45 +183,18 @@ export default function Column({ column, fetchBoard }) {
                     setState(idle);
                 },
                 onDrop({ source, self }) {
-                    // console.log("Column's on drop was called")
                     setState(idle);
-
-                    // if (isCardData(source.data)) {
-                    //     console.log("Dropped card :", source.data.card);
-                    //     console.log("Comes from column :", source.data.columnId);
-                    //     console.log("Dropped on column", self.data.column);
-                    // }
-
-                    // if (isColumnData(source.data)) {
-                    //     console.log("Dropped column :", source.data.column);
-                    //     console.log("Comes from column :", source.data.columnId);
-                    //     console.log("Dropped on column", self.data.column);
-                    // }
                 },
             }),
             autoScrollForElements({
                 canScroll({ source }) {
-                    // if (!settings.isOverElementAutoScrollEnabled) {
-                    //     return false;
-                    // }
-
                     return isDraggingACard({ source });
                 },
-                // getConfiguration: () => ({ maxScrollSpeed: settings.columnScrollSpeed }),
                 element: scrollable,
             }),
             unsafeOverflowAutoScrollForElements({
                 element: scrollable,
-                // getConfiguration: () => ({ maxScrollSpeed: settings.columnScrollSpeed }),
                 canScroll({ source }) {
-                    // if (!settings.isOverElementAutoScrollEnabled) {
-                    //     return false;
-                    // }
-
-                    // if (!settings.isOverflowScrollingEnabled) {
-                    //     return false;
-                    // }
-
                     return isDraggingACard({ source });
                 },
                 getOverflow() {

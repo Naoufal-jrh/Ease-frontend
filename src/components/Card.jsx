@@ -171,18 +171,6 @@ export default function Card({ card, columnId }) {
                 },
                 onDrop({ source, self }) {
                     setState(idle);
-                    // if (isCardData(source.data)) {
-                    //     // when changing cards order within the same column or different column
-                    //     // need :
-                    //     //      movedCardColumnId
-                    //     //      movedCardId
-                    //     //      dropedOnCardColumnId
-                    //     //      dropedOnCardId
-                    //     console.log("moved card column Id", source.data.columnId)
-                    //     console.log("moved card Id", source.data.card.id)
-                    //     console.log("droped on card column Id", self.data.columnId)
-                    //     console.log("droped on card column Id", self.data.card.id)
-                    // }
                 },
             }),
         );

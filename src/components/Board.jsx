@@ -33,12 +33,9 @@ export default function Board({ data, setData, fetchBoard }) {
         register,
         reset
     } = useForm();
-    // const [data, setData] = useState(initial);
 
     async function updateCardsList(columnId, cards) {
-        console.log("changing the cards order of the column with id ", columnId)
-        console.log("new cards order : " + JSON.stringify(cards))
-        const res = await fetch("http://localhost:8080/card/toColumn/" + columnId,
+        await fetch("http://localhost:8080/card/toColumn/" + columnId,
             {
                 method: "PUT",
                 headers: {
@@ -47,14 +44,10 @@ export default function Board({ data, setData, fetchBoard }) {
                 body: JSON.stringify(cards),
             }
         );
-        const newColumn = await res.json()
-        console.log("new cards ", newColumn);
     }
 
     async function updateColumnsList(columns) {
-        console.log("changing the columns order for board id ", data.id)
-        console.log("new column order : " + JSON.stringify(columns))
-        const res = await fetch("http://localhost:8080/column/toBoard/" + data.id,
+        await fetch("http://localhost:8080/column/toBoard/" + data.id,
             {
                 method: "PUT",
                 headers: {
@@ -63,14 +56,11 @@ export default function Board({ data, setData, fetchBoard }) {
                 body: JSON.stringify(columns),
             }
         );
-        const newBoard = await res.json()
-        console.log(newBoard);
     }
 
 
     async function handleAddNewColumn(column) {
-        console.log("adding column ", column)
-        const res = await fetch("http://localhost:8080/column?boardId=" + data.id,
+        await fetch("http://localhost:8080/column?boardId=" + data.id,
             {
                 method: "POST",
                 headers: {
@@ -84,12 +74,8 @@ export default function Board({ data, setData, fetchBoard }) {
                 )
             }
         )
-        const newColumn = await res.json();
-
         fetchBoard();
-        reset()
-
-        console.log("new column ", newColumn);
+        reset();
     }
 
 
@@ -161,12 +147,7 @@ export default function Board({ data, setData, fetchBoard }) {
                             };
                             const columns = Array.from(data.columns);
                             columns[homeColumnIndex] = updated;
-                            // here call the patch api with the column id and the column new cards list
-                            // new list : columns
-                            // column id : dropTargetData.columnId
-                            // console.log("reordering in home column")
-                            // console.log("column id", home.id)
-                            // console.log("reordered cards", reordered)
+                            // save the new order in the backend
                             updateCardsList(home.id, reordered.map(({ id, description }) => ({ id, description })));
                             setData({ ...data, columns });
                             return;
@@ -203,13 +184,7 @@ export default function Board({ data, setData, fetchBoard }) {
                             ...destination,
                             cards: destinationCards,
                         };
-                        // console.log("moving a card from one column to another");
-                        // console.log("source column id:", home.id);
-                        // console.log("destination column id:", destination.id);
-                        // console.log("moved card:", dragging.card);
-
-                        // console.log("new source column cards:", homeCards);
-                        // console.log("new destination column cards:", destinationCards);
+                        // save the changes to the backend
                         updateCardsList(home.id, homeCards)
                             .then(() => updateCardsList(destination.id, destinationCards));
                         setData({ ...data, columns });
@@ -269,7 +244,7 @@ export default function Board({ data, setData, fetchBoard }) {
                             ...destination,
                             cards: destinationCards,
                         };
-
+                        // save the changes to the backend
                         updateCardsList(home.id, homeCards)
                             .then(() => updateCardsList(destination.id, destinationCards));
                         setData({ ...data, columns });
@@ -315,6 +290,7 @@ export default function Board({ data, setData, fetchBoard }) {
                         startIndex: homeIndex,
                         finishIndex: destinationIndex,
                     });
+                    // save the new order to the backend
                     updateColumnsList(reordered)
                     setData({ ...data, columns: reordered });
                 },
@@ -322,28 +298,14 @@ export default function Board({ data, setData, fetchBoard }) {
             // handling horizontal scrolling
             autoScrollForElements({
                 canScroll({ source }) {
-                    // if (!settings.isOverElementAutoScrollEnabled) {
-                    //     return false;
-                    // }
-
                     return isDraggingACard({ source }) || isDraggingAColumn({ source });
                 },
-                // getConfiguration: () => ({ maxScrollSpeed: settings.boardScrollSpeed }),
                 element,
             }),
             // handle columns overflow for scroll
             unsafeOverflowAutoScrollForElements({
                 element,
-                // getConfiguration: () => ({ maxScrollSpeed: settings.boardScrollSpeed }),
                 canScroll({ source }) {
-                    // if (!settings.isOverElementAutoScrollEnabled) {
-                    //     return false;
-                    // }
-
-                    // if (!settings.isOverflowScrollingEnabled) {
-                    //     return false;
-                    // }
-
                     return isDraggingACard({ source }) || isDraggingAColumn({ source });
                 },
                 getOverflow() {
