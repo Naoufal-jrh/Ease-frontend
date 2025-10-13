@@ -53,7 +53,7 @@ export default function Column({ column, fetchBoard }) {
 
 
     async function handleAdddCard(card) {
-        const res = await fetch("http://localhost:8080/column/" + column.id,
+        const res = await fetch("http://localhost:8080/card?columnId=" + column.id,
             {
                 method: "POST",
                 headers: {

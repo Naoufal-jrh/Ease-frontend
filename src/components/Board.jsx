@@ -37,34 +37,30 @@ export default function Board({ data, setData, fetchBoard }) {
 
     async function updateCardsList(columnId, cards) {
         console.log("changing the cards order of the column with id ", columnId)
-        console.log("new cards order : " + cards)
-        const res = await fetch("http://localhost:8080/column/" + columnId,
+        console.log("new cards order : " + JSON.stringify(cards))
+        const res = await fetch("http://localhost:8080/card/toColumn/" + columnId,
             {
-                method: "PATCH",
+                method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({
-                    cards: cards,
-                }),
+                body: JSON.stringify(cards),
             }
         );
         const newColumn = await res.json()
-        // console.log(newColumn);
+        console.log("new cards ", newColumn);
     }
 
     async function updateColumnsList(columns) {
         console.log("changing the columns order for board id ", data.id)
-        console.log("new column order : " + columns)
-        const res = await fetch("http://localhost:8080/board/" + data.id,
+        console.log("new column order : " + JSON.stringify(columns))
+        const res = await fetch("http://localhost:8080/column/toBoard/" + data.id,
             {
-                method: "PATCH",
+                method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({
-                    columns: columns,
-                }),
+                body: JSON.stringify(columns),
             }
         );
         const newBoard = await res.json()
@@ -171,7 +167,7 @@ export default function Board({ data, setData, fetchBoard }) {
                             // console.log("reordering in home column")
                             // console.log("column id", home.id)
                             // console.log("reordered cards", reordered)
-                            updateCardsList(home.id, reordered.map(({ id }) => ({ id })));
+                            updateCardsList(home.id, reordered.map(({ id, description }) => ({ id, description })));
                             setData({ ...data, columns });
                             return;
                         }
