@@ -21,17 +21,41 @@ import {
 } from "@/utils/data";
 import { blockBoardPanningAttr } from "@/utils/data-atributes";
 import { updateCards, updateColumns } from "@/lib/api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 
-export function useBoardDnD({ data, setData }) {
+export function useBoardDnD({ boardId }) {
     const scrollableRef = useRef(null)
+    const queryClient = useQueryClient();
 
-    async function updateCardsList(columnId, cards) {
-        await updateCards(columnId, cards);
+    const cardsMutation = useMutation({
+        mutationFn: ({ columnId, cards }) => updateCards(columnId, cards),
+        onError: (error) => {
+            console.log("an error was throwen", error)
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: ['board', boardId] })
+        }
+    });
+
+    const columnsMutation = useMutation({
+        mutationFn: (columns) => updateColumns(boardId, columns),
+        onError: (error) => {
+            console.log("an error was throwen", error)
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: ['board', boardId] })
+        }
+    })
+
+    function updateCardsList(columnId, cards) {
+        // await updateCards(columnId, cards);
+        cardsMutation.mutate({ columnId, cards });
     }
 
-    async function updateColumnsList(columns) {
-        await updateColumns(data.id, columns)
+    function updateColumnsList(columns) {
+        columnsMutation.mutate(columns);
+        // await updateColumns(queryClient.getQueryData(['board', boardId]).id, columns)
     }
 
     useEffect(() => {
@@ -53,10 +77,10 @@ export function useBoardDnD({ data, setData }) {
                         return;
                     }
                     const dropTargetData = innerMost.data;
-                    const homeColumnIndex = data.columns.findIndex(
+                    const homeColumnIndex = queryClient.getQueryData(['board', boardId]).columns.findIndex(
                         (column) => column.id === dragging.columnId,
                     );
-                    const home = data.columns[homeColumnIndex];
+                    const home = queryClient.getQueryData(['board', boardId]).columns[homeColumnIndex];
 
                     if (!home) {
                         return;
@@ -65,10 +89,10 @@ export function useBoardDnD({ data, setData }) {
 
                     // dropping on a card
                     if (isCardDropTargetData(dropTargetData)) {
-                        const destinationColumnIndex = data.columns.findIndex(
+                        const destinationColumnIndex = queryClient.getQueryData(['board', boardId]).columns.findIndex(
                             (column) => column.id === dropTargetData.columnId,
                         );
-                        const destination = data.columns[destinationColumnIndex];
+                        const destination = queryClient.getQueryData(['board', boardId]).columns[destinationColumnIndex];
                         // reordering in home column
                         if (home === destination) {
                             const cardFinishIndex = home.cards.findIndex(
@@ -99,11 +123,11 @@ export function useBoardDnD({ data, setData }) {
                                 ...home,
                                 cards: reordered,
                             };
-                            const columns = Array.from(data.columns);
+                            const columns = Array.from(queryClient.getQueryData(['board', boardId]).columns);
                             columns[homeColumnIndex] = updated;
                             // save the new order in the backend
                             updateCardsList(home.id, reordered.map(({ id, description }) => ({ id, description })));
-                            setData({ ...data, columns });
+                            queryClient.setQueryData(['board', boardId], { ...queryClient.getQueryData(['board', boardId]), columns })
                             return;
                         }
 
@@ -129,7 +153,7 @@ export function useBoardDnD({ data, setData }) {
                         const destinationCards = Array.from(destination.cards);
                         destinationCards.splice(finalIndex, 0, dragging.card);
 
-                        const columns = Array.from(data.columns);
+                        const columns = Array.from(queryClient.getQueryData(['board', boardId]).columns);
                         columns[homeColumnIndex] = {
                             ...home,
                             cards: homeCards,
@@ -139,18 +163,19 @@ export function useBoardDnD({ data, setData }) {
                             cards: destinationCards,
                         };
                         // save the changes to the backend
-                        updateCardsList(home.id, homeCards)
-                            .then(() => updateCardsList(destination.id, destinationCards));
-                        setData({ ...data, columns });
+                        updateCardsList(home.id, homeCards);
+                        updateCardsList(destination.id, destinationCards);
+
+                        queryClient.setQueryData(['board', boardId], { ...queryClient.getQueryData(['board', boardId]), columns })
                         return;
                     }
 
                     // dropping onto a column, but not onto a card
                     if (isColumnData(dropTargetData)) {
-                        const destinationColumnIndex = data.columns.findIndex(
+                        const destinationColumnIndex = queryClient.getQueryData(['board', boardId]).columns.findIndex(
                             (column) => column.id === dropTargetData.column.id,
                         );
-                        const destination = data.columns[destinationColumnIndex];
+                        const destination = queryClient.getQueryData(['board', boardId]).columns[destinationColumnIndex];
 
                         if (!destination) {
                             return;
@@ -171,10 +196,10 @@ export function useBoardDnD({ data, setData }) {
                                 ...home,
                                 cards: reordered,
                             };
-                            const columns = Array.from(data.columns);
+                            const columns = Array.from(queryClient.getQueryData(['board', boardId]).columns);
                             columns[homeColumnIndex] = updated;
 
-                            setData({ ...data, columns });
+                            queryClient.setQueryData({ ...queryClient.getQueryData(['board', boardId]), columns })
                             return;
                         }
 
@@ -189,7 +214,7 @@ export function useBoardDnD({ data, setData }) {
                         const destinationCards = Array.from(destination.cards);
                         destinationCards.splice(destination.cards.length, 0, dragging.card);
 
-                        const columns = Array.from(data.columns);
+                        const columns = Array.from(queryClient.getQueryData(['board', boardId]).columns);
                         columns[homeColumnIndex] = {
                             ...home,
                             cards: homeCards,
@@ -200,8 +225,8 @@ export function useBoardDnD({ data, setData }) {
                         };
                         // save the changes to the backend
                         updateCardsList(home.id, homeCards)
-                            .then(() => updateCardsList(destination.id, destinationCards));
-                        setData({ ...data, columns });
+                        updateCardsList(destination.id, destinationCards)
+                        queryClient.setQueryData(['board', boardId], { ...queryClient.getQueryData(['board', boardId]), columns })
                         return;
                     }
                 },
@@ -226,8 +251,8 @@ export function useBoardDnD({ data, setData }) {
                         return;
                     }
 
-                    const homeIndex = data.columns.findIndex((column) => column.id === dragging.column.id);
-                    const destinationIndex = data.columns.findIndex(
+                    const homeIndex = queryClient.getQueryData(['board', boardId]).columns.findIndex((column) => column.id === dragging.column.id);
+                    const destinationIndex = queryClient.getQueryData(['board', boardId]).columns.findIndex(
                         (column) => column.id === dropTargetData.column.id,
                     );
 
@@ -240,13 +265,13 @@ export function useBoardDnD({ data, setData }) {
                     }
 
                     const reordered = reorder({
-                        list: data.columns,
+                        list: queryClient.getQueryData(['board', boardId]).columns,
                         startIndex: homeIndex,
                         finishIndex: destinationIndex,
                     });
                     // save the new order to the backend
                     updateColumnsList(reordered)
-                    setData({ ...data, columns: reordered });
+                    queryClient.setQueryData(['board', boardId], { ...queryClient.getQueryData(['board', boardId]), columns: reordered });
                 },
             }),
             // handling horizontal scrolling
@@ -278,7 +303,7 @@ export function useBoardDnD({ data, setData }) {
                 },
             }),
         );
-    }, [data]);
+    }, [queryClient.getQueryData(['board', boardId])]);
 
     // Panning the board
     useEffect(() => {

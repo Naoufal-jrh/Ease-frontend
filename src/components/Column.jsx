@@ -1,10 +1,11 @@
 import { memo, useEffect, useRef, useState } from "react";
 import Card, { CardShadow } from "./Card";
-import { Copy, Ellipsis, Plus, XIcon } from "lucide-react";
+import { Columns, Copy, Ellipsis, Plus, XIcon } from "lucide-react";
 import { blockBoardPanningAttr } from "@/utils/data-atributes";
 import { useForm } from "react-hook-form";
 import { addCard } from "@/lib/api";
 import { useColumnDnD } from "@/hooks/useColumnDnD";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const stateStyles = {
     idle: 'cursor-grab',
@@ -20,7 +21,7 @@ const CardList = memo(function CardList({ column }) {
 });
 
 
-export default function Column({ column, fetchBoard }) {
+export default function Column({ column, boardId }) {
     const [state, setState] = useState(idle);
     const [showAddCardForm, setShowAddCardForm] = useState(false);
     const {
@@ -35,9 +36,48 @@ export default function Column({ column, fetchBoard }) {
         handleSubmit,
     } = useForm()
 
+    const queryClient = useQueryClient()
+
+
+    const mutation = useMutation({
+        mutationFn: (card) => addCard(column.id, card),
+        onMutate: async (data) => {
+            await queryClient.cancelQueries({ queryKey: ['board', boardId] });
+            const previousBoard = queryClient.getQueryData(['board', boardId]);
+            queryClient.setQueryData(['board', boardId], old => {
+                if (!old) return old;
+
+                return {
+                    ...old,
+                    columns: old.columns.map(col => {
+                        if (col.id === column.id) {
+                            return {
+                                ...col,
+                                cards: [...col.cards, {
+                                    id: -1,
+                                    ...data
+                                }],
+                            };
+                        }
+                        return col;
+                    }),
+                }
+            });
+            return { previousBoard }
+        },
+        onError: (error, context) => {
+            // TODO: show an error message 
+            console.log("an error occured", error);
+            queryClient.setQueryData(['board', boardId], context.previousBoard);
+        },
+        onSettled: () => {
+            // instead of revalidating you can just get the new added board and add it instead
+            queryClient.invalidateQueries({ queryKey: ['board', boardId] })
+        }
+    })
+
     async function handleAddCard(card) {
-        await addCard(column.id, card);
-        fetchBoard();
+        mutation.mutate(card)
         reset();
     }
 

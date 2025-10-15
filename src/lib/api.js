@@ -66,8 +66,6 @@ export async function updateColumns(boardId, columns) {
 }
 
 export async function addColumn(boardId, column) {
-    console.log("adding new column : ", column)
-    console.log("to board", boardId)
     return await apiFetch(`/column?boardId=${boardId}`, {
         method: "POST",
         body: {

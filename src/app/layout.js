@@ -2,6 +2,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Bell, Home, KanbanIcon, Settings } from "lucide-react";
 import Link from "next/link";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import AppContainer from "@/components/AppContainer";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -34,9 +36,9 @@ export default function RootLayout({ children }) {
                         <span className="bg-gray-200 p-2 rounded-full font-bold text-gray-500 hover:bg-gray-300 text-xs cursor-pointer">NJ</span>
                     </div>
                 </header>
-                <div>
+                <AppContainer>
                     {children}
-                </div>
+                </AppContainer>
             </body>
         </html>
     );
