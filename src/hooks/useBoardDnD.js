@@ -30,8 +30,29 @@ export function useBoardDnD({ boardId }) {
 
     const cardsMutation = useMutation({
         mutationFn: ({ columnId, cards }) => updateCards(columnId, cards),
-        onError: (error) => {
+        onMutate: (data) => {
+            queryClient.cancelQueries({ queryKey: ['board', boardId] })
+            const previousBoard = queryClient.getQueryData({ queryKey: ['board', boardId] })
+            queryClient.setQueryData(['board', boardId], (old) => {
+                // replace the cards of the column with the new cards
+                if (!old) return old;
+                const res = {
+                    ...old,
+                    columns: old.columns.map((column) => {
+                        if (column.id === data.columnId) return {
+                            ...column,
+                            cards: data.cards
+                        };
+                        return column;
+                    })
+                }
+                return res
+            });
+            return { previousBoard }
+        },
+        onError: (error, context) => {
             console.log("an error was throwen", error)
+            queryClient.setQueryData(['board', boardId], context.previousBoard)
         },
         onSettled: () => {
             queryClient.invalidateQueries({ queryKey: ['board', boardId] })
@@ -40,8 +61,25 @@ export function useBoardDnD({ boardId }) {
 
     const columnsMutation = useMutation({
         mutationFn: (columns) => updateColumns(boardId, columns),
-        onError: (error) => {
+        onMutate: (data) => {
+            console.log("columns mutation data : ", data)
+            queryClient.cancelQueries({ queryKey: ['board', boardId] })
+            const previousBoard = queryClient.getQueryData({ queryKey: ['board', boardId] })
+            queryClient.setQueryData(['board', boardId], (old) => {
+                // replace the cards of the column with the new cards
+                if (!old) return old;
+                const res = {
+                    ...old,
+                    columns: data
+                }
+                console.log("columns res : ", res)
+                return res;
+            });
+            return { previousBoard }
+        },
+        onError: (error, context) => {
             console.log("an error was throwen", error)
+            queryClient.setQueryData(['board', boardId], context.previousBoard)
         },
         onSettled: () => {
             queryClient.invalidateQueries({ queryKey: ['board', boardId] })
@@ -127,7 +165,7 @@ export function useBoardDnD({ boardId }) {
                             columns[homeColumnIndex] = updated;
                             // save the new order in the backend
                             updateCardsList(home.id, reordered.map(({ id, description }) => ({ id, description })));
-                            queryClient.setQueryData(['board', boardId], { ...queryClient.getQueryData(['board', boardId]), columns })
+                            // queryClient.setQueryData(['board', boardId], { ...queryClient.getQueryData(['board', boardId]), columns })
                             return;
                         }
 
@@ -166,7 +204,7 @@ export function useBoardDnD({ boardId }) {
                         updateCardsList(home.id, homeCards);
                         updateCardsList(destination.id, destinationCards);
 
-                        queryClient.setQueryData(['board', boardId], { ...queryClient.getQueryData(['board', boardId]), columns })
+                        // queryClient.setQueryData(['board', boardId], { ...queryClient.getQueryData(['board', boardId]), columns })
                         return;
                     }
 
@@ -226,7 +264,7 @@ export function useBoardDnD({ boardId }) {
                         // save the changes to the backend
                         updateCardsList(home.id, homeCards)
                         updateCardsList(destination.id, destinationCards)
-                        queryClient.setQueryData(['board', boardId], { ...queryClient.getQueryData(['board', boardId]), columns })
+                        // queryClient.setQueryData(['board', boardId], { ...queryClient.getQueryData(['board', boardId]), columns })
                         return;
                     }
                 },
@@ -271,7 +309,7 @@ export function useBoardDnD({ boardId }) {
                     });
                     // save the new order to the backend
                     updateColumnsList(reordered)
-                    queryClient.setQueryData(['board', boardId], { ...queryClient.getQueryData(['board', boardId]), columns: reordered });
+                    // queryClient.setQueryData(['board', boardId], { ...queryClient.getQueryData(['board', boardId]), columns: reordered });
                 },
             }),
             // handling horizontal scrolling
