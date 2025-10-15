@@ -9,7 +9,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 export default function BoardsPage() {
-    // const [boards, setBoards] = useState([]);
     const queryClient = useQueryClient();
     const [isOpen, setIsOpen] = useState(false);
     const { handleSubmit, register, reset } = useForm();

@@ -29,8 +29,8 @@ export default function RootLayout({ children }) {
 
   const linkBase =
     "flex flex-row gap-4 items-center p-2 rounded-lg transition-colors duration-150";
-  const activeClass = "bg-blue-400";
-  const inactiveClass = "hover:bg-blue-100 text-slate-700";
+  const activeClass = "bg-blue-300 text-black";
+  const inactiveClass = "hover:bg-blue-100 text-gray-500";
 
 
   return (
@@ -39,14 +39,14 @@ export default function RootLayout({ children }) {
         <Link href={"/boards"}>
           <div className={`${linkBase} ${isActive("/boards") ? activeClass : inactiveClass}`}>
             <KanbanIcon size={16} strokeWidth={3} />
-            <span className="font-medium text-slate-700 text-[15px]">Boards</span>
+            <span className="font-medium text-[15px]">Boards</span>
           </div>
 
         </Link>
         <Link href={"/"} >
           <div className={`${linkBase} ${isActive("/") ? activeClass : inactiveClass}`}>
             <Home size={16} strokeWidth={3} />
-            <span className="font-medium text-slate-700 text-[15px]">Home</span>
+            <span className="font-medium text-[15px]">Home</span>
           </div>
         </Link>
       </aside>

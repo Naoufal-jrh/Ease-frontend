@@ -37,10 +37,12 @@ async function apiFetch(path, { method = 'GET', body = null, retries = 2 } = {})
 }
 
 export async function getBoards() {
+    console.log("getBoards called")
     return await apiFetch("/board")
 }
 
 export async function addBoard(board) {
+    console.log("addBoard called")
     return await apiFetch("/board", {
         method: 'POST',
         body: board
@@ -48,10 +50,12 @@ export async function addBoard(board) {
 }
 
 export async function getBoardById(boardId) {
+    console.log("getBoardById called")
     return await apiFetch(`/board/${boardId}`);
 }
 
 export async function updateCards(columnId, cards) {
+    console.log("updateCards called")
     return await apiFetch(`/card/toColumn/${columnId}`, {
         method: 'PUT',
         body: cards
@@ -59,6 +63,7 @@ export async function updateCards(columnId, cards) {
 }
 
 export async function updateColumns(boardId, columns) {
+    console.log("updateColumns called")
     return await apiFetch(`/column/toBoard/${boardId}`, {
         method: 'PUT',
         body: columns
@@ -66,6 +71,7 @@ export async function updateColumns(boardId, columns) {
 }
 
 export async function addColumn(boardId, column) {
+    console.log("addColumn called")
     return await apiFetch(`/column?boardId=${boardId}`, {
         method: "POST",
         body: {
@@ -76,6 +82,7 @@ export async function addColumn(boardId, column) {
 }
 
 export async function addCard(columnId, card) {
+    console.log("addCard called")
     return await apiFetch(`/card?columnId=${columnId}`, {
         method: "POST",
         body: card
