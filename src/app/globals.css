@@ -1,5 +1,34 @@
 @import "tailwindcss";
 
+/* e.g. src/styles/theme.css or globals.css */
+
+@import "tailwindcss";
+
+/* Define your theme variables */
+@theme inline {
+  --color-brand-primary: oklch(68.5% 0.169 237.323);
+  --color-brand-secondary: oklch(90.1% 0.058 230.902);
+  --font-sans: "Inter", sans-serif;
+  /* --radius-xl: 1rem; */
+
+  /* You can also override default tokens: */
+  /* --radius-lg: 0.75rem;
+  --spacing-4: 1rem; */
+
+}
+
+/* Optionally define root / dark mode variable sets */
+:root {
+  --color-background: #ffffff;
+  --color-text: #111111;
+}
+
+.dark {
+  --color-background: #111111;
+  --color-text: #eeeeee;
+}
+
+
 /* :root {
   --background: #ffffff;
   --foreground: #171717;

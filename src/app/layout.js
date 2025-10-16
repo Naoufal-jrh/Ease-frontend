@@ -24,7 +24,7 @@ export default function RootLayout({ children }) {
     return (
         <html lang="en">
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-                <header className="flex flex-row justify-between items-center bg-white px-20 py-3 border-b-1 border-gray-200">
+                <header className="flex flex-row justify-between items-center bg-white px-10 md:px-20 py-3 border-b-1 border-gray-200 ">
                     <Link href={"/"} className="text-2xl font-bold text-sky-700 font-mono">ease</Link>
                     <div className="flex flex-row items-center gap-3">
                         <button className="p-2 hover:bg-gray-200 rounded-lg cursor-pointer">

@@ -29,13 +29,13 @@ export default function RootLayout({ children }) {
 
   const linkBase =
     "flex flex-row gap-4 items-center p-2 rounded-lg transition-colors duration-150";
-  const activeClass = "bg-blue-300 text-black";
-  const inactiveClass = "hover:bg-blue-100 text-gray-500";
+  const activeClass = "bg-brand-primary text-black";
+  const inactiveClass = "hover:bg-brand-secondary text-gray-500";
 
 
   return (
-    <div className="flex flex-row px-20 py-8">
-      <aside className="w-[20%] flex flex-col gap-2">
+    <div className="flex flex-row p-10 md:px-20 md:py-8 gap-10">
+      <aside className="w-[20%] flex-col gap-2 max-w-[20rem] min-w-[15rem] hidden sm:flex">
         <Link href={"/boards"}>
           <div className={`${linkBase} ${isActive("/boards") ? activeClass : inactiveClass}`}>
             <KanbanIcon size={16} strokeWidth={3} />
@@ -50,7 +50,7 @@ export default function RootLayout({ children }) {
           </div>
         </Link>
       </aside>
-      <main className="w-[80%] px-15">
+      <main className="w-full flex justify-center">
         {children}
       </main>
     </div>

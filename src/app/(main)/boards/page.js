@@ -41,7 +41,7 @@ export default function BoardsPage() {
     }
 
     return (
-        <div className="p-5">
+        <div className="px-5 w-full max-w-[100rem]">
             <div className="flex flex-row justify-between items-center">
                 <h2 className="text-xl font-semibold text-slate-700 mt-6 mb-4">Boards</h2>
                 <PopUp isOpen={isOpen} setIsOpen={setIsOpen} buttonText="Create" title="Add new board" >
@@ -56,7 +56,7 @@ export default function BoardsPage() {
             {
                 isPending ? <div className="w-full py-10 flex justify-center items-center">
                     <LoaderPinwheel />
-                </div> : <div className="grid grid-cols-4 gap-4">
+                </div> : <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
                     {
                         boards.map((board) => <BoardCard key={board.id} boardName={board.name} boardId={board.id} />)
                     }
@@ -82,7 +82,7 @@ function BoardCard({ boardName, boardId }) {
 
 function Header() {
     return (
-        <div className="flex flex-row justify-between items-center mb-6">
+        <div className="flex-row justify-between items-center mb-6 hidden lg:flex">
             <div className="flex flex-row gap-4 items-center">
                 <Grid color="black" />
                 <Rows color="gray" />
